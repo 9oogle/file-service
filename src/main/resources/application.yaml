@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: file-service
+
+  config:
+    import:
+      - "optional:configserver: "
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+eureka:
+  instance:
+    prefer-ip-address: false
+    hostname: ${HOSTNAME:localhost}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://34.64.58.121:8761/eureka/,http://34.64.104.174:8761/eureka/

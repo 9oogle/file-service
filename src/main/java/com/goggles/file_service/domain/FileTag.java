@@ -1,6 +1,6 @@
 package com.goggles.file_service.domain;
 
-import com.goggles.file_service.exception.FileStorageException;
+import com.goggles.file_service.domain.exception.FileStorageException;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

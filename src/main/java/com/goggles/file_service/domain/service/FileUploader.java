@@ -1,4 +1,4 @@
-package com.goggles.file_service.service;
+package com.goggles.file_service.domain.service;
 
 import com.goggles.file_service.domain.FileInfo;
 import com.goggles.file_service.domain.FileTag;

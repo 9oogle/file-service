@@ -1,4 +1,4 @@
-package com.goggles.file_service.exception;
+package com.goggles.file_service.domain.exception;
 
 import com.goggles.common.exception.BadRequestException;
 

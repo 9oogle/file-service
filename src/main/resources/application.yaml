@@ -1,21 +1,86 @@
+# file-service/src/main/resources/application.yaml
 spring:
   application:
     name: file-service
 
+  # ===== 로컬 부트스트랩 (영구 유지) =====
   config:
     import:
-      - "optional:configserver: "
+      - "optional:configserver:"
   cloud:
     config:
       discovery:
-        enabled: true
+        enabled: false  # TODO: 배포 시 true
         service-id: config-server
+
+  # ===== ↓↓↓ 나중에 project-configs/file-service.yaml 로 옮길 부분 ↓↓↓ =====
+
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:goggles}
+    username: ${DB_USERNAME:goggles}
+    password: ${DB_PASSWORD:goggles}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: ${DB_DDL_AUTO:update}     # 로컬: update, 운영: validate
+    show-sql: true
+    open-in-view: false
+    generate-ddl: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: file              # ← 스키마 분리할 거면 활성화
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+      file-size-threshold: 20MB
+
+server:
+  port: 9012   # openApi 태스크의 apiDocsUrl과 일치시킴
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
+    org.hibernate.orm.jdbc.bind: trace
+
+# 파일 스토리지 설정
+file:
+  storage:
+    type: local                            # local, s3, gcs
+    endpoint: ${STORAGE_ENDPOINT:http://localhost:9012}
+  local:
+    base:
+      path: ${FILE_BASE_PATH:./storage/files}
+      url: ${FILE_BASE_URL:/upload/}
+  s3:
+    bucket: sparta-bucket
+    region: ap-northeast-2
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+
+# ===== ↑↑↑ 여기까지 ↑↑↑ =====
+
 eureka:
   instance:
     prefer-ip-address: false
     hostname: ${HOSTNAME:localhost}
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: false   # TODO: 배포 시 true
+    fetch-registry: false         # TODO: 배포 시 true
     service-url:
       defaultZone: http://34.64.58.121:8761/eureka/,http://34.64.104.174:8761/eureka/

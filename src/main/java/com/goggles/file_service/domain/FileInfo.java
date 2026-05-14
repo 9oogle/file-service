@@ -1,13 +1,17 @@
 package com.goggles.file_service.domain;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import com.goggles.common.domain.BaseAudit;
-import com.goggles.file_service.exception.FileStorageException;
-import com.goggles.file_service.service.FileUploader;
+import com.goggles.common.exception.ForbiddenException;
+import com.goggles.common.exception.UnAuthorizedException;
+import com.goggles.file_service.domain.exception.FileStorageException;
+import com.goggles.file_service.domain.service.FileUploader;
+import com.goggles.file_service.domain.service.RoleChecker;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -33,7 +37,7 @@ public class FileInfo extends BaseAudit {
 	@Id
 	@Column(name = "file_id", length = 45)
 	@GeneratedValue(strategy = GenerationType.UUID)
-	private Long id;
+	private UUID id;
 
 	@Embedded
 	private FileGroup group;
@@ -52,7 +56,12 @@ public class FileInfo extends BaseAudit {
 	}
 
 	public static FileInfo upload(Storage storage, String groupId, FileTag tag,
-		FileSource source, FileUploader uploader) {
+		FileSource source, FileUploader uploader, RoleChecker checker) {
+		//파일 업로드는 로그인 사용자만 가능
+		if (!checker.isLoggedIn()) {
+			throw new UnAuthorizedException("파일업로드는 로그인이 필요합니다.");
+		}
+
 		//파일 업로드 진행
 		String filePath = uploader.upload(tag, source);
 		if (!StringUtils.hasText(filePath)) {
@@ -70,6 +79,7 @@ public class FileInfo extends BaseAudit {
 			.build();
 	}
 
+	@Builder
 	public record FileSource(
 		InputStream inputStream,
 		String originalFileName,
@@ -79,8 +89,12 @@ public class FileInfo extends BaseAudit {
 	}
 
 	//파일 삭제는 master 또는 파일소유자만 삭제 가능
-	public void delete() {
-		
+	public void delete(RoleChecker checker) {
+		if (!checker.isMaster() && !checker.isMine(this)) {
+			throw new ForbiddenException("파일삭제 권한이 없습니다.");
+		}
+
+		softDelete(checker.getLoggedUserId());
 	}
 
 }

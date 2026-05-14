@@ -27,7 +27,7 @@ public class FileGroup {
 
 	//GroupId, Tags는 필수
 	protected FileGroup(String groupId, FileTag tag) {
-		if (!StringUtils.isEmpty(groupId)) {
+		if (!StringUtils.hasText(groupId)) {
 			throw new BadRequestException("groupId는 필수 입력 값입니다.");
 		}
 

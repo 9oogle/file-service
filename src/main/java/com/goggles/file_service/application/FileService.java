@@ -59,6 +59,12 @@ public class FileService {
 		);
 	}
 
+	@Transactional
+	public void delete(UUID fileId) {
+		FileInfo fileInfo = getFileInfo(fileId);
+		fileInfo.delete(roleChecker);
+	}
+
 	private FileInfo getFileInfo(UUID fileId) {
 		return fileQueryRepository.findById(fileId)
 			.orElseThrow(() -> new FileNotFoundException(fileId));

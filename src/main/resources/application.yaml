@@ -61,17 +61,21 @@ logging:
 # 파일 스토리지 설정
 file:
   storage:
-    type: local                            # local, s3, gcs
+    type: ${FILE_STORAGE_TYPE}                            # local, s3, gcs
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9012}
   local:
     base:
       path: ${FILE_BASE_PATH:./storage/files}
       url: ${FILE_BASE_URL:/upload/}
   s3:
-    bucket: sparta-bucket
-    region: ap-northeast-2
-    access-key: ${AWS_ACCESS_KEY_ID:}
-    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    bucket: ${AWS_S3_BUCKET}
+    region: ${AWS_S3_REGION:ap-northeast-2}
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+  gcs:
+    bucket: ${GCS_BUCKET}
+    project-id: ${GCS_PROJECT_ID}
+    key-path: ${GCS_KEY_PATH}
 
 # ===== ↑↑↑ 여기까지 ↑↑↑ =====
 

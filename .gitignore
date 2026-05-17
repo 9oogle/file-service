@@ -40,3 +40,7 @@ storage/files/
 **/storage/files/
 generated/
 logs/
+
+gcp_ket.json
+/src/main/resources/gcp_key.json.json
+/storage/

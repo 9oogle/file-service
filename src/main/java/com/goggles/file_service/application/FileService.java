@@ -35,8 +35,8 @@ public class FileService {
 	@Value("${file.storage.type:local}")
 	private String storage;
 
+	@Transactional
 	public UUID upload(FileServiceDto.FileUpload dto) {
-
 		FileInfo fileInfo = FileInfo.upload(
 			Storage.from(storage),
 			dto.groupId(),
@@ -44,7 +44,6 @@ public class FileService {
 			dto.toSource(),
 			fileUploader,
 			roleChecker
-
 		);
 		fileRepository.save(fileInfo);
 		return fileInfo.getId();
@@ -53,6 +52,9 @@ public class FileService {
 	@Transactional(readOnly = true)
 	public FileServiceDto.FileDownload download(UUID fileId) {
 		FileInfo fileInfo = getFileInfo(fileId);
+
+		// 다운로드 권한 검증 (강의 자료/동영상은 수강자만 가능)
+		fileInfo.verifyDownloadable(roleChecker);
 
 		return FileServiceDto.FileDownload.from(
 			fileDownloader.download(fileInfo)

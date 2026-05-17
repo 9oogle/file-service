@@ -7,9 +7,11 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import com.goggles.common.domain.BaseAudit;
-import com.goggles.common.exception.ForbiddenException;
-import com.goggles.common.exception.UnAuthorizedException;
+import com.goggles.file_service.domain.exception.FileDeleteForbiddenException;
+import com.goggles.file_service.domain.exception.FileErrorCode;
+import com.goggles.file_service.domain.exception.FileForbiddenException;
 import com.goggles.file_service.domain.exception.FileStorageException;
+import com.goggles.file_service.domain.exception.FileUploadUnauthorizedException;
 import com.goggles.file_service.domain.service.FileUploader;
 import com.goggles.file_service.domain.service.RoleChecker;
 
@@ -59,13 +61,13 @@ public class FileInfo extends BaseAudit {
 		FileSource source, FileUploader uploader, RoleChecker checker) {
 		//파일 업로드는 로그인 사용자만 가능
 		if (!checker.isLoggedIn()) {
-			throw new UnAuthorizedException("파일업로드는 로그인이 필요합니다.");
+			throw new FileUploadUnauthorizedException();
 		}
 
 		//파일 업로드 진행
 		String filePath = uploader.upload(tag, source);
 		if (!StringUtils.hasText(filePath)) {
-			throw new FileStorageException("업로드 실패");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_UPLOAD_FAILED);
 		}
 		//파일 정보 엔티티 완성
 		return FileInfo.builder()
@@ -91,10 +93,26 @@ public class FileInfo extends BaseAudit {
 	//파일 삭제는 master 또는 파일소유자만 삭제 가능
 	public void delete(RoleChecker checker) {
 		if (!checker.isMaster() && !checker.isMine(this)) {
-			throw new ForbiddenException("파일삭제 권한이 없습니다.");
+			throw new FileDeleteForbiddenException();
 		}
 
 		softDelete(checker.getLoggedUserId());
+	}
+
+	public void verifyDownloadable(RoleChecker checker) {
+		FileTag tag = this.group.getTag();
+
+		if (!tag.isDownloadable()) {
+			throw new FileForbiddenException(
+				FileErrorCode.FILE_DOWNLOAD_FORBIDDEN
+			);
+		}
+
+		if (tag.isEnrollmentRequired() && !checker.canDownload(this)) {
+			throw new FileForbiddenException(
+				FileErrorCode.FILE_DOWNLOAD_FORBIDDEN
+			);
+		}
 	}
 
 }

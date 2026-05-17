@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import com.goggles.file_service.domain.FileInfo;
+import com.goggles.file_service.domain.exception.FileErrorCode;
 import com.goggles.file_service.domain.exception.FileNotFoundException;
 import com.goggles.file_service.domain.exception.FileStorageException;
 import com.goggles.file_service.domain.service.FileDownloadContent;
@@ -56,7 +57,7 @@ public class S3FileDownloader implements FileDownloader {
 			throw new FileNotFoundException(fileInfo.getId());
 		} catch (Exception e) {
 			log.error("AWS S3 다운로드 중 오류 발생 - 사유: {}", e.getMessage(), e);
-			throw new FileStorageException("파일 다운로드 중 오류가 발생했습니다.");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_DOWNLOAD_ERROR);
 		}
 	}
 }

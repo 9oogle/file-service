@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.goggles.file_service.domain.FileInfo;
 import com.goggles.file_service.domain.FileTag;
+import com.goggles.file_service.domain.exception.FileErrorCode;
 import com.goggles.file_service.domain.exception.FileStorageException;
 import com.goggles.file_service.domain.service.FileUploader;
 import com.goggles.file_service.infrastructure.storage.config.LocalStorageProperties;
@@ -39,7 +40,7 @@ public class LocalFileUploader implements FileUploader {
 	@Override
 	public String upload(FileTag tag, FileInfo.FileSource source) {
 		//서버 업로드 경로
-		String today = formatter.format(LocalDateTime.now());
+		String today = formatter.format(LocalDate.now());
 		String relativePath = "%s/%s".formatted(tag.getDirectory(), today);
 		Path parentPath = Path.of(properties.path()).toAbsolutePath().normalize();
 		Path targetDirectory = parentPath.resolve(relativePath);
@@ -62,7 +63,8 @@ public class LocalFileUploader implements FileUploader {
 
 		} catch (IOException e) {
 			log.error("로컬 파일 업로드 실패 - 업로드 경로 {}, 사유{}", targetDirectory, e.getMessage(), e);
-			throw new FileStorageException("퍄일 저장 중 시스템 오류가 발생했습니다.");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_IO_ERROR);
+
 		}
 	}
 

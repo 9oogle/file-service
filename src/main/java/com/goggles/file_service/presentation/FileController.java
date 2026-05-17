@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,19 +36,22 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 public class FileController {
+
 	private final FileService fileService;
 	private final FileQueryService fileQueryService;
 
 	@ResponseStatus(HttpStatus.CREATED)
-	@PostMapping(path = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public List<FileResponse.Upload> upload(@Valid FileRequest.Upload request,
 		@RequestPart("file") MultipartFile[] files) throws IOException {
 		List<FileResponse.Upload> uploads = new ArrayList<>();
 		for (MultipartFile file : files) {
-			if (file.isEmpty())
+			if (file.isEmpty()) {
 				continue;
+			}
 
 			UUID fileId = fileService.upload(request.toServiceDto(file));
 			uploads.add(new FileResponse.Upload(fileId));
@@ -71,7 +75,6 @@ public class FileController {
 			.cacheControl(CacheControl.noCache())
 			.contentLength(download.contentLength())
 			.body(new InputStreamResource(download.inputStream()));
-
 	}
 
 	@DeleteMapping("/{fileId}")
@@ -80,14 +83,13 @@ public class FileController {
 		fileService.delete(fileId);
 	}
 
-	@GetMapping("/{fileId}/details")
+	@GetMapping(path = "/{fileId}/details", produces = MediaType.APPLICATION_JSON_VALUE)
 	public FileResponse.FileInfo getFileInfo(@PathVariable("fileId") UUID fileId) {
 		return FileResponse.FileInfo.from(fileQueryService.findById(fileId));
-
 	}
 
-	@GetMapping("/serach")
-	public List<FileResponse.FileInfo> getFile(@Valid FileRequest.FileSearch search) {
+	@GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<FileResponse.FileInfo> getFiles(@Valid FileRequest.FileSearch search) {
 		String groupId = search.groupId();
 		String tag = search.tag();
 		return fileQueryService.findAll(groupId, tag)
@@ -95,5 +97,4 @@ public class FileController {
 			.map(FileResponse.FileInfo::from)
 			.toList();
 	}
-
 }

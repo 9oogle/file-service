@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.goggles.file_service.domain.FileInfo;
 import com.goggles.file_service.domain.FileTag;
+import com.goggles.file_service.domain.exception.FileErrorCode;
 import com.goggles.file_service.domain.exception.FileStorageException;
 import com.goggles.file_service.domain.service.FileUploader;
 import com.goggles.file_service.infrastructure.storage.config.GcsStorageProperties;
@@ -48,7 +49,7 @@ public class GcsFileUploader implements FileUploader {
 			return relativePath;
 		} catch (Exception e) {
 			log.error("Google Cloud Storage 파일 업로드 실패 - 사유: {}", e.getMessage(), e);
-			throw new FileStorageException("파일 업로드 중 오류가 발생했습니다.");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_UPLOAD_ERROR);
 		}
 
 	}

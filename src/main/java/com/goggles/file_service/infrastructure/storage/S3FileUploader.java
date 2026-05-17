@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.goggles.file_service.domain.FileInfo;
 import com.goggles.file_service.domain.FileTag;
+import com.goggles.file_service.domain.exception.FileErrorCode;
 import com.goggles.file_service.domain.exception.FileStorageException;
 import com.goggles.file_service.domain.service.FileUploader;
 import com.goggles.file_service.infrastructure.storage.config.S3StorageProperties;
@@ -40,7 +41,7 @@ public class S3FileUploader implements FileUploader {
 		String today = formatter.format(LocalDate.now());
 		String storageFileName = StorageHelper.getStorageFileName(source.originalFileName());
 		String relativePath = "%s/%s/%s".formatted(tag.getDirectory(), today, storageFileName);
-		
+
 		try (InputStream inputStream = source.inputStream()) {
 			PutObjectRequest request = PutObjectRequest.builder()
 				.bucket(s3StorageProperties.bucket())
@@ -55,7 +56,7 @@ public class S3FileUploader implements FileUploader {
 			return relativePath;
 		} catch (Exception e) {
 			log.error("AWS S3 파일 업로드 실패 - 사유: {}", e.getMessage(), e);
-			throw new FileStorageException("파일 업로드 중 오류가 발생했습니다.");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_UPLOAD_ERROR);
 		}
 	}
 }

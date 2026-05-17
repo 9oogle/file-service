@@ -1,5 +1,6 @@
 package com.goggles.file_service.domain;
 
+import com.goggles.file_service.domain.exception.FileErrorCode;
 import com.goggles.file_service.domain.exception.FileStorageException;
 
 import lombok.Getter;
@@ -21,7 +22,7 @@ public enum Storage {
 			return Storage.valueOf(storageType.toUpperCase());
 		} catch (IllegalArgumentException | NullPointerException e) {
 			log.warn("지원하지 않는 저장소- 타입: {} , 사유: {}", storageType, e.getMessage(), e);
-			throw new FileStorageException("저장하지 않는 저장소 타입 입니다.");
+			throw new FileStorageException(FileErrorCode.FILE_STORAGE_TYPE_UNSUPPORTED);
 		}
 	}
 }

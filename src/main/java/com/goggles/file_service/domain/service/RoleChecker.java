@@ -12,4 +12,6 @@ public interface RoleChecker {
 	boolean isLoggedIn();
 
 	UUID getLoggedUserId();
+
+	boolean canDownload(FileInfo fileInfo);
 }

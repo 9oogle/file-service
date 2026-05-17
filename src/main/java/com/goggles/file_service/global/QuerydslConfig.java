@@ -1,4 +1,4 @@
-package com.goggles.file_service.infrastructure.storage.config;
+package com.goggles.file_service.global;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

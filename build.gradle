@@ -47,7 +47,7 @@ dependencies {
     // ── Database (JPA + PostgreSQL) ────────────────────
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
-    
+
     // ── Messaging (Kafka) ───────────────────────────────
     implementation 'org.springframework.kafka:spring-kafka'
 
@@ -60,6 +60,9 @@ dependencies {
     // ── Lombok ──────────────────────────────────────────
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // loki
+    implementation 'com.github.loki4j:loki-logback-appender:1.5.2'
 
     implementation 'com.google.cloud:google-cloud-storage:2.68.0'
     implementation 'software.amazon.awssdk:s3:2.44.0'

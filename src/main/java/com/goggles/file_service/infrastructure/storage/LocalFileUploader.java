@@ -55,8 +55,10 @@ public class LocalFileUploader implements FileUploader {
 			String storageFileName = StorageHelper.getStorageFileName(source.originalFileName());
 			//파일 업로드 경로 생성
 			Path targetFile = targetDirectory.resolve(storageFileName);
-			//파일 업로드
-			Files.copy(source.inputStream(), targetFile, StandardCopyOption.REPLACE_EXISTING);
+			//파일 업로드 (InputStream 명시적 종료)
+			try (var in = source.inputStream()) {
+				Files.copy(in, targetFile, StandardCopyOption.REPLACE_EXISTING);
+			}
 
 			log.info("로컬 파일 업로드 성공 - 업로드 경로 {}", targetFile);
 			return relativePath + "/" + storageFileName;

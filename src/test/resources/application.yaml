@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+    discovery:
+      enabled: false
+  config:
+    import: "optional:configserver:"
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+file:
+  storage:
+    type: local
+    endpoint: http://localhost:9012
+    path: ./upload

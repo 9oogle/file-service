@@ -15,9 +15,7 @@ spring:
 logging:
   level:
     root: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type: trace
-    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.SQL: INFO
 
 eureka:
   client:
@@ -25,3 +23,15 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${EUREKA_SERVER_URL1:localhost}:9001/eureka/,http://${EUREKA_SERVER_URL2:localhost}:9002/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
+    org.hibernate.orm.jdbc.bind: trace
